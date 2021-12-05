@@ -11,6 +11,10 @@ app.use(express.json());
 
 app.post('/recommendations', songController.addNewSong);
 
+app.post('/recommendations/:id/upvote', songController.vote);
+
+app.post('/recommendations/:id/downvote', songController.vote);
+
 // eslint-disable-next-line no-unused-vars
 app.use((error, request, response, next) => {
   console.log({ error, request, response });
