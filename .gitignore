@@ -3,8 +3,12 @@
 
 #testing
 .env.test
+/coverage
 
 #dev
 .vscode
 .eslint.cjs
 .env
+
+######
+draft*
