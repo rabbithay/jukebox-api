@@ -6,9 +6,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node --experimental-modules --es-module-specifier-resolution=node src/server.js",
-    "test": "NODE_ENV=test npx jest --passWithNoTests --noStackTrace --runInBand --silent",
-    "test:verbose": "NODE_ENV=test npx jest --passWithNoTests --noStackTrace --runInBand --verbose",
-    "test:watch": "NODE_ENV=test npx jest --passWithNoTests --noStackTrace --runInBand --watch",
+    "test": "NODE_ENV=test yarn run jest --passWithNoTests --noStackTrace --runInBand --silent",
+    "test:verbose": "NODE_ENV=test yarn run jest --passWithNoTests --noStackTrace --runInBand --verbose",
+    "test:watch": "NODE_ENV=test yarn run jest --passWithNoTests --noStackTrace --runInBand --watch",
     "dev": "NODE_ENV=dev nodemon --experimental-modules --es-module-specifier-resolution=node src/server.js"
   },
   "repository": {
