@@ -1,11 +1,10 @@
 /* eslint-disable no-undef */
 import 'jest';
 import faker from 'faker';
-import generateNewSongObject from '../factories/generateNewSongObject';
+import { newSongBody } from '../factories/generateNewSongObject';
 import { addNewSongSchema } from '../../src/schemas/addNewSongSchema';
 
-const newSongOnject = generateNewSongObject;
-const { name, youtubeLink } = newSongOnject;
+const { name, youtubeLink } = newSongBody;
 
 describe('songService#isYoutubeLink', () => {
   it('should return error in case of name is not a string', () => {
