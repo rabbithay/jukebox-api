@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 const { Pool } = pg;
 dotenv.config();
 
+// eslint-disable-next-line no-console
 console.log(`Using the database ${process.env.DB_DATABASE}.`);
 
 let databaseConfig = {
@@ -17,9 +18,6 @@ let databaseConfig = {
 if (process.env.DATABASE_URL) {
   databaseConfig = {
     connectionString: process.env.DATABASE_URL,
-    // ssl: {
-    //   rejectUnauthorized: false,
-    // },
   };
 }
 
