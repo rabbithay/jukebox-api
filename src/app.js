@@ -15,8 +15,13 @@ app.post('/recommendations/:id/upvote', songController.vote);
 
 app.post('/recommendations/:id/downvote', songController.vote);
 
+app.get('/recommendations/random', songController.getRecommendation);
+
+app.get('/recommendations/top/:amount', songController.getTopSongs);
+
 // eslint-disable-next-line no-unused-vars
 app.use((error, request, response, next) => {
+  // eslint-disable-next-line no-console
   console.log({ error, request, response });
   return response.sendStatus(500);
 });
