@@ -25,7 +25,7 @@ export async function vote(req, res) {
   if (!isValidId) return res.sendStatus(404);
 
   const songExist = await songService.checkSongExist(id);
-  if (!songExist) return res.sendStatus(400);
+  if (!songExist) return res.sendStatus(404);
 
   await songService.updateScore({ id, vote: 'up' });
   return res.sendStatus(200);
