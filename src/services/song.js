@@ -35,7 +35,7 @@ export async function getRandomRecommendation() {
 
   const recommendation = await songRepository.getRecommendation({ rating });
 
-  if (!recommendation) return await songRepository.getRecommendation();
+  if (!recommendation) return await songRepository.getRecommendation({ rating: null });
 
   return recommendation;
 }

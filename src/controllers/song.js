@@ -32,18 +32,21 @@ export async function vote(req, res) {
 }
 
 export async function getRecommendation(req, res) {
+  const recommendation = await songService.getRandomRecommendation();
+  if (!recommendation) return res.sendStatus(404);
+
   const {
     song_id, song_name, song_url, song_score,
-  } = await songService.getRandomRecommendation();
+  } = recommendation;
 
-  const recommendation = {
+  const response = {
     id: song_id,
     name: song_name,
     youtubeLink: song_url,
     score: song_score,
   };
 
-  res.send(recommendation).status(200);
+  return res.status(200).send(response);
 }
 
 export async function getTopSongs(req, res) {
