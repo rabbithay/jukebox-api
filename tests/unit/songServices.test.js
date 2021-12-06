@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import 'jest';
-import {songBody} from '../factories/generateCreatedSongObject';
+import { songBody } from '../factories/generateCreatedSongObject';
 import * as songRepository from '../../src/repositories/song';
 import * as songService from '../../src/services/song';
 
@@ -8,7 +8,7 @@ const {
   id, name, youtubeLink,
 } = songBody;
 
-describe('songService#addNewSong', () => {
+describe('#addNewSong', () => {
   it('should return error in case of returns an error from repository', async () => {
     jest.spyOn(songRepository, 'insertSong').mockRejectedValueOnce(new Error('song not created'));
 
@@ -21,22 +21,23 @@ describe('songService#addNewSong', () => {
     }
   });
 
-  it('should not return error in case of success', async () => {
-    jest.spyOn(songRepository, 'insertSong').mockResolvedValueOnce('song created');
+  it('should add a song in case of success', async () => {
+    const insertSongSpy = jest.spyOn(songRepository, 'insertSong').mockImplementationOnce(async () => 'song added');
 
     const input = { name, youtubeLink };
 
-    await songService.addNewSong(input);
+    const result = await songService.addNewSong(input);
 
-    expect(Promise.resolve('song created')).resolves.toBe('song created');
+    expect(insertSongSpy).toHaveBeenCalled();
+    expect(result).toBe('song added');
   });
 });
 
-describe('songService#checkSongExist', () => {
+describe('#checkSongExist', () => {
   it('should return error in case of returns an error from repository', async () => {
     jest.spyOn(songRepository, 'getSongById').mockRejectedValueOnce(new Error('unsolved'));
 
-    const input = { id: Number() };
+    const input = { id };
 
     try {
       await songService.checkSongExist(input);
@@ -46,67 +47,59 @@ describe('songService#checkSongExist', () => {
   });
 
   it('should return true in case of song exist', async () => {
-    jest.spyOn(songRepository, 'getSongById').mockResolvedValueOnce('song was found');
+    const getSongByIdSpy = jest.spyOn(songRepository, 'getSongById').mockImplementationOnce(async () => true);
 
-    const input = { id: Number() };
+    const input = { id };
 
-    try {
-      await songService.checkSongExist(input);
-    } catch (error) {
-      expect(error).toBeUndefined();
-    }
+    const result = await songService.checkSongExist(input);
 
-    expect(Promise.resolve('song was found')).resolves.toBeTruthy();
+    expect(getSongByIdSpy).toHaveBeenCalled();
+    expect(result).toBeTruthy();
   });
 
-  it('should return false in case of song exist', async () => {
-    jest.spyOn(songRepository, 'getSongById').mockResolvedValueOnce(null);
+  it('should return false in case of song not exist', async () => {
+    const getSongByIdSpy = jest.spyOn(songRepository, 'getSongById').mockImplementationOnce(async () => undefined);
 
-    const input = { id: Number() };
+    const input = { id };
 
-    try {
-      await songService.checkSongExist(input);
-    } catch (error) {
-      expect(error).toBeUndefined();
-    }
-
-    expect(Promise.resolve()).resolves.toBeFalsy();
+    const result = await songService.checkSongExist(input);
+    expect(getSongByIdSpy).toHaveBeenCalled();
+    expect(result).toBeFalsy();
   });
 });
 
-describe('songService#updateScore', () => {
-  describe('when is up vote', ()=>{
+describe('#updateScore', () => {
+  describe('when is up vote', () => {
     it('should return error in case of returns an error from repository', async () => {
       jest.spyOn(songRepository, 'updateScore').mockRejectedValueOnce(new Error('song does not exist'));
-  
+
       const input = { id, vote: 'up' };
-  
+
       try {
         await songService.updateScore(input);
       } catch (error) {
         expect(error.message).toBe('song does not exist');
       }
     });
-  
+
     it('should vote in case of success', async () => {
       const updateScoreSpy = jest.spyOn(songRepository, 'updateScore').mockImplementationOnce(async () => 'voted');
-  
-      const input = { id, vote: 'up' };
-  
-      const result = await songService.updateScore(input);
-   
-      expect(updateScoreSpy).toHaveBeenCalled()
-      expect(result).toBe('voted')
 
+      const input = { id, vote: 'up' };
+
+      const result = await songService.updateScore(input);
+
+      expect(updateScoreSpy).toHaveBeenCalled();
+      expect(result).toBe('voted');
     });
-  })
-  
-  describe('when is down vote', ()=>{
+  });
+
+  describe('when is down vote', () => {
     it('should return error in case of returns an error from repository', async () => {
       jest.spyOn(songRepository, 'getSongById').mockRejectedValueOnce(new Error('song does not exist'));
-  
+
       const input = { id, vote: 'down' };
-  
+
       try {
         await songService.updateScore(input);
       } catch (error) {
@@ -117,25 +110,25 @@ describe('songService#updateScore', () => {
     it('should delete the song in case of score = -4', async () => {
       jest.spyOn(songRepository, 'getSongById').mockImplementationOnce(async () => ({ song_score: -4 }));
       const deleteSongSpy = jest.spyOn(songRepository, 'deleteSong').mockImplementationOnce(async () => 'deleted');
-  
-      const input = { id, vote: "down" };
-  
+
+      const input = { id, vote: 'down' };
+
       const result = await songService.updateScore(input);
-  
+
       expect(deleteSongSpy).toHaveBeenCalled();
-      expect(result).toBe('deleted')
+      expect(result).toBe('deleted');
     });
 
     it('should delete the song in case of score = -5', async () => {
       jest.spyOn(songRepository, 'getSongById').mockImplementationOnce(async () => ({ song_score: -5 }));
       const deleteSongSpy = jest.spyOn(songRepository, 'deleteSong').mockImplementationOnce(async () => 'deleted');
-  
-      const input = { id, vote: "down" };
-  
+
+      const input = { id, vote: 'down' };
+
       const result = await songService.updateScore(input);
-  
+
       expect(deleteSongSpy).toHaveBeenCalled();
-      expect(result).toBe('deleted')
+      expect(result).toBe('deleted');
     });
 
     it('should vote in case of score = -3', async () => {
@@ -143,21 +136,98 @@ describe('songService#updateScore', () => {
       const deleteSongSpy = jest.spyOn(songRepository, 'deleteSong').mockImplementationOnce(async () => 'deleted');
       const updateScoreSpy = jest.spyOn(songRepository, 'updateScore').mockImplementationOnce(async () => 'voted');
 
-      const input = { id, vote: "down" };
-  
+      const input = { id, vote: 'down' };
+
       const result = await songService.updateScore(input);
-  
+
       expect(deleteSongSpy).not.toHaveBeenCalled();
-      expect(updateScoreSpy).toHaveBeenCalled()
-      expect(result).toBe('voted')
+      expect(updateScoreSpy).toHaveBeenCalled();
+      expect(result).toBe('voted');
     });
-  })
+  });
 });
 
-describe('songService#getRandomRecommendation', ()=>{
-  it('should return ')
+describe('#getRandomRecommendation', () => {
+  it('should return error in case of returns an error from repository', async () => {
+    jest.spyOn(songRepository, 'getRecommendation').mockRejectedValueOnce(new Error('recommendation not selected'));
+
+    try {
+      await songService.getRandomRecommendation();
+    } catch (error) {
+      expect(error.message).toBe('recommendation not selected');
+    }
+  });
+
+  describe('when gets lower rating recommendation', () => {
+    it('should return lower recommendation if there is lower recommendation', async () => {
+      jest.spyOn(global.Math, 'random').mockReturnValue(0.3);
+      jest.spyOn(songRepository, 'getRecommendation')
+        .mockImplementationOnce(async () => 'lower recommendation')
+        .mockImplementationOnce(async () => 'any recommendation');
+
+      const result = await songService.getRandomRecommendation();
+
+      expect(result).toBe('lower recommendation');
+    });
+
+    it('should return any recommendation if there is no lower recommendation', async () => {
+      jest.spyOn(global.Math, 'random').mockReturnValue(0.29);
+      jest.spyOn(songRepository, 'getRecommendation')
+        .mockImplementationOnce(async () => undefined)
+        .mockImplementationOnce(async () => 'any recommendation');
+
+      const result = await songService.getRandomRecommendation();
+
+      expect(result).toBe('any recommendation');
+    });
+  });
+
+  describe('when gets higher rating recommendation', () => {
+    it('should return higher recommendation if there is higher recommendation', async () => {
+      jest.spyOn(global.Math, 'random').mockReturnValue(0.31);
+      jest.spyOn(songRepository, 'getRecommendation')
+        .mockImplementationOnce(async () => 'higher recommendation')
+        .mockImplementationOnce(async () => 'any recommendation');
+
+      const result = await songService.getRandomRecommendation();
+
+      expect(result).toBe('higher recommendation');
+    });
+
+    it('should return any recommendation if there is no higher recommendation', async () => {
+      jest.spyOn(global.Math, 'random').mockReturnValue(1);
+      jest.spyOn(songRepository, 'getRecommendation')
+        .mockImplementationOnce(async () => undefined)
+        .mockImplementationOnce(async () => 'any recommendation');
+
+      const result = await songService.getRandomRecommendation();
+
+      expect(result).toBe('any recommendation');
+    });
+  });
 });
 
-describe('songService#getListOfTopSongs', ()=>{
+describe('#getListOfTopSongs', () => {
+  it('should return error in case of returns an error from repository', async () => {
+    jest.spyOn(songRepository, 'getSongsByScore').mockRejectedValueOnce(new Error('unsolved'));
 
+    const input = { id };
+
+    try {
+      await songService.getListOfTopSongs(input);
+    } catch (error) {
+      expect(error.message).toBe('unsolved');
+    }
+  });
+
+  it('should return a list of top songs in case of success', async () => {
+    const getSongsByScoreSpy = jest.spyOn(songRepository, 'getSongsByScore').mockImplementationOnce(async () => 'list of top songs');
+
+    const input = { amount: id };
+
+    const result = await songService.getListOfTopSongs(input);
+
+    expect(getSongsByScoreSpy).toHaveBeenCalled();
+    expect(result).toBe('list of top songs');
+  });
 });
