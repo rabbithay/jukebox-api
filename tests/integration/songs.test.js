@@ -123,40 +123,56 @@ describe('GET /recommendations/random', () => {
       expect(response.status).toBe(404);
     });
   });
-
-  // describe('when there is registered songs should response with status 200', () => {
-  //   it('and in case of require lower rating recommendation should answer with status 200')
-  //   it('in caso of should answer with status 200', async () => {
-  //     const
-  //     const id1 = await addSongIntoDatabaseReturningId(5)
-  //     const id2 = await addSongIntoDatabaseReturningId(20)
-
-  //     const response = await supertest(app).get(
-  //       '/recommendations/random',
-  //     );
-  //     expect(response.status).toBe(200);
-  //   });
-  // })
 });
 
-// describe('GET /recommendations/top/:amount', () => {
-//   it('should answer with status 200', async () => {
-//     await connection.query(`
-//       INSERT INTO songs
-//       (name, "youtubeLink", score)
-//       VALUES ($1, $2, $3),
-//       ($4, $5, $6),
-//       ($7, $8, $9)
-//     `, [song.name, song.youtubeLink, 5,
-//       song2.name, song2.youtubeLink, 20,
-//       song3.name, song3.youtubeLink, 12]);
+describe('GET /recommendations/top/:amount', () => {
+  it('should answer with status 200 in case of valid amount value', async () => {
+    await addSongIntoDatabaseReturningId(15);
+    await addSongIntoDatabaseReturningId(9);
+    await addSongIntoDatabaseReturningId(3);
+    await addSongIntoDatabaseReturningId(-3);
 
-//     const response = await supertest(app).get(
-//       '/recommendations/top/3',
-//     );
-//     expect(response.status).toBe(200);
-//   });
-// });
+    const amount = 2;
+
+    const response = await supertest(app).get(
+      `/recommendations/top/${amount}`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body[0].score).toEqual(15);
+    expect(response.body[1].score).toEqual(9);
+  });
+
+  it('should answer with status 200 in case of valid amount value', async () => {
+    await addSongIntoDatabaseReturningId(15);
+    await addSongIntoDatabaseReturningId(9);
+
+    const amount = 3;
+
+    const response = await supertest(app).get(
+      `/recommendations/top/${amount}`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body[0].score).toEqual(15);
+    expect(response.body[1].score).toEqual(9);
+  });
+
+  it('should answer with status 404 in case of invalid amount value', async () => {
+    await addSongIntoDatabaseReturningId(15);
+    await addSongIntoDatabaseReturningId(9);
+    await addSongIntoDatabaseReturningId(3);
+    await addSongIntoDatabaseReturningId(-3);
+
+    const amount = NaN;
+
+    const response = await supertest(app).get(
+      `/recommendations/top/${amount}`,
+    );
+
+    expect(response.status).toBe(404);
+  });
+});
 
 afterAll(async () => {
   await connection.end();
