@@ -25,25 +25,28 @@ export async function vote(req, res) {
   if (!isValidId) return res.sendStatus(404);
 
   const songExist = await songService.checkSongExist(id);
-  if (!songExist) return res.sendStatus(400);
+  if (!songExist) return res.sendStatus(404);
 
   await songService.updateScore({ id, vote: 'up' });
   return res.sendStatus(200);
 }
 
 export async function getRecommendation(req, res) {
+  const recommendation = await songService.getRandomRecommendation();
+  if (!recommendation) return res.sendStatus(404);
+
   const {
     song_id, song_name, song_url, song_score,
-  } = await songService.getRandomRecommendation();
+  } = recommendation;
 
-  const recommendation = {
+  const response = {
     id: song_id,
     name: song_name,
     youtubeLink: song_url,
     score: song_score,
   };
 
-  res.send(recommendation).status(200);
+  return res.status(200).send(response);
 }
 
 export async function getTopSongs(req, res) {
