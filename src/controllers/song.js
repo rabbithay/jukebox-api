@@ -10,6 +10,12 @@ export async function addNewSong(req, res) {
   return res.sendStatus(201);
 }
 
-export async function check() {
-//
+export async function vote(req, res) {
+  const { id } = req.params;
+
+  const songExist = await songService.songExist(id);
+  if (!songExist || id.isNaN()) return res.sendStatus(400);
+
+  await songService.updateScore({ id, vote: 'up' });
+  return res.sendStatus(200);
 }
